@@ -70,7 +70,6 @@ services:
     environment:
       - PORKBUN_API_KEY_FILE=/secrets/porkbun.apikey
       - PORKBUN_SECRET_API_KEY_FILE=/secrets/porkbun.secretkey
-      - TRAEFIK_CERTIFICATESRESOLVERS_MYRESOLVER_ACME_EMAIL=mgb@alumni.brown.edu
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
