@@ -16,7 +16,7 @@ providers:
     filename: /config.yml
 log:
   filePath: "/logs/traefik.log"
-  level: DEBUG
+  #level: DEBUG
 certificatesResolvers:
   myresolver:
     acme:
