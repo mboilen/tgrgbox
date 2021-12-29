@@ -1,0 +1,34 @@
+{
+  "name": "tgrgbace.tv",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mboilen/tgrgbace.tv.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mboilen/tgrgbace.tv/issues"
+  },
+  "homepage": "https://github.com/mboilen/tgrgbace.tv#readme",
+  "devDependencies": {
+    "base64url": "^3.0.1",
+    "copy-webpack-plugin": "^9.0.0",
+    "dotenv": "^10.0.0",
+    "html-webpack-plugin": "^5.3.1",
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.0"
+  },
+  "dependencies": {
+    "dashjs": "^4.2.1",
+    "hls.js": "^1.1.2",
+    "ovenplayer": "^0.10.14"
+  }
+}

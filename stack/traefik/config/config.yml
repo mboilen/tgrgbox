@@ -1,0 +1,10 @@
+http:
+ #region routers 
+  routers:
+
+#endregion
+#region services
+  services:
+        passHostHeader: true
+#endregion
+  middlewares:
