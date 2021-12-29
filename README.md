@@ -23,6 +23,7 @@ Optionally you can create
 1. OAuth client id and secret id from your discord app
 2. AUTH_SECRET - a random string
 3. OvenMediaEngine signing key - a random string.  Try to avoid xml metacharacters for your own sanity
+4. A list of discord email addresses that are allowed to access the platform
 
 In addition you need everything necessary to configure a DNS Challenge provider for an ACME certificate resolver in Traefik: https://doc.traefik.io/traefik/https/acme/#dnschallenge
 
@@ -32,7 +33,7 @@ In addition you need everything necessary to configure a DNS Challenge provider 
 ```git clone git@github.com:mboilen/tgrgbace-ome.git```
 
 ## Fill in .env files
-Copy `stack/env.template` and `tgrgbace.tv/env.template` and fill in the appropriate secrets
+Copy `stack/env.template` and `tgrgbace.tv/env.template` and fill in the appropriate secrets.  AUTH_WHITELIST is a comma separated list of email addresses that are allowed.
 
 ## Configure OvenMediaEngine
 Edit `stack/ovenmediaengine/origin_conf/Server.xml`.  Under `<VirtualHosts>`, set up the `<Names>` list to be the correct names for your hostnames (all three of them).
