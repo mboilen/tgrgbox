@@ -105,7 +105,7 @@ function createSources() {
     console.log('********************************');
     console.log();
 
-    console.log(sourcesString);
+    //console.log(sourcesString);
 
     return sourcesString;
 }
