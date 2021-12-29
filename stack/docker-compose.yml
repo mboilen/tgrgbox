@@ -96,15 +96,15 @@ services:
       #uncomment to enable traefik dashboard
       #- "traefik.http.routers.traefik.rule=Host(`dashboard.${TGRGBACE_HOSTNAME}`)"
 
-  whoami:
-    container_name: whoami
-    image: containous/whoami
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.whoami.entrypoints=https"
-      - "traefik.http.routers.whoami.tls=true"
-      - "traefik.http.routers.whoami.rule=Host(`whoami.${TGRGBACE_HOSTNAME}`)"
-      - "traefik.http.routers.whoami.middlewares=traefik-forward-auth"
+# whoami:
+#   container_name: whoami
+#   image: containous/whoami
+#   labels:
+#     - "traefik.enable=true"
+#     - "traefik.http.routers.whoami.entrypoints=https"
+#     - "traefik.http.routers.whoami.tls=true"
+#     - "traefik.http.routers.whoami.rule=Host(`whoami.${TGRGBACE_HOSTNAME}`)"
+#     - "traefik.http.routers.whoami.middlewares=traefik-forward-auth"
 
   traefik-forward-auth:
     image: thomseddon/traefik-forward-auth:2
