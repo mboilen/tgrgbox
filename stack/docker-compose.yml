@@ -115,8 +115,9 @@ services:
       - PROVIDERS_GENERIC_OAUTH_CLIENT_SECRET=${AUTH_PROVIDERS_GENERIC_OAUTH_CLIENT_SECRET}
       - PROVIDERS_GENERIC_OAUTH_AUTH_URL=https://discord.com/api/oauth2/authorize
       - PROVIDERS_GENERIC_OAUTH_TOKEN_URL=https://discord.com/api/oauth2/token
-      - PROVIDERS_GENERIC_OAUTH_USER_URL=https://discord.com/api/users/@me
-      - PROVIDERS_GENERIC_OAUTH_SCOPE=identify email
+        #- PROVIDERS_GENERIC_OAUTH_USER_URL=https://discord.com/api/users/@me
+      - PROVIDERS_GENERIC_OAUTH_USER_URL=http://discord-user-proxy:80/
+      - PROVIDERS_GENERIC_OAUTH_SCOPE=identify
       - SECRET=${AUTH_SECRET}
       - INSECURE_COOKIE=false # Example assumes no https, do not use in production
       - WHITELIST=${AUTH_WHITELIST}
@@ -126,6 +127,12 @@ services:
       - "traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://traefik-forward-auth:4181"
       - "traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders=X-Forwarded-User"
       - "traefik.http.services.traefik-forward-auth.loadbalancer.server.port=4181"
+  discord-user-proxy:
+    image: mboilen/discord-user-proxy
+    container_name: discord-user-proxy
+    labels:
+      - "traefik.enable=false"
+    
 
 networks:
   default:
