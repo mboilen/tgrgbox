@@ -1,6 +1,4 @@
 # Prerequisites
-## Install prerequesites
-todo
 ## Discord setup:
 Go to https://discord.com/developers/applications and log in
 Create an application 
@@ -26,6 +24,36 @@ Optionally you can create
 4. A list of discord email addresses that are allowed to access the platform
 
 In addition you need everything necessary to configure a DNS Challenge provider for an ACME certificate resolver in Traefik: https://doc.traefik.io/traefik/https/acme/#dnschallenge
+
+## Install prerequesites
+### Install Docker
+(Following directions from https://docs.docker.com/engine/install/ubuntu/)
+
+Prereqs:
+
+```sudo apt-get install ca-certificates curl gnupg lsb-release```
+
+Install Key and source
+ ```
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+```
+  
+Update apt and install docker
+```
+sudo apt-get update
+ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose
+```
+ 
+ Add current user to docker group:
+ 
+ ```sudo usermod -aG docker $USER```
+ 
+Log out and back in again to pick up the new group
 
 # Installation
 
