@@ -18,7 +18,7 @@ services:
       - OME_DASH_STREAM_PORT=80
       - OME_SIGNALLING_PORT=80
       - OME_TCP_RELAY_ADDRESS=*:3478
-      - OME_ICE_CANDIDATES=*:10006-10010/udp
+      - OME_ICE_CANDIDATES=*:10000-10005/udp
     volumes:
       - ./ovenmediaengine/origin_conf:/opt/ovenmediaengine/bin/origin_conf
       - ./ovenmediaengine/logs:/var/log/ovenmediaengine
