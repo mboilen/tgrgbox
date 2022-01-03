@@ -58,7 +58,7 @@ Log out and back in again to pick up the new group
 # Installation
 
 ## Clone the git repo:
-```git clone git@github.com:mboilen/tgrgbace-ome.git```
+```git clone git@github.com:mboilen/tgrgbox.git```
 
 ## Fill in .env files
 Copy `stack/env.template` and `tgrgbace.tv/env.template` and fill in the appropriate secrets.  AUTH_WHITELIST is a comma separated list of email addresses that are allowed.
