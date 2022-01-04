@@ -104,7 +104,9 @@ Before you start it up, I recommend uncommenting whoami and the traefik dashboar
 ```docker-compose up -d```
 from the stack directory
 
-Traefik can take a minute or two to create the wildcard certificate.  Chrome has an annoying behavior where it will continue to report a site as insecure even when it has a certificate if you previously visited it when it didn't.  If you open up an incognito window you'll see the correct certificate.  You may run into that when initially testing everything.
+Traefik can take eight to ten minutes to create the wildcard certificate.  You should immediately see the TXT records get created and some blob get put into acme.json.  Keep an eye on traefik/logs/traefik.log and the modstamp on acme.json to see when it completes (or fails).
+
+Chrome has an annoying behavior where it will continue to report a site as insecure even when it has a certificate if you previously visited it when it didn't.  If you open up an incognito window you'll see the correct certificate.  You may run into that when initially testing everything.  
 
 ## Test it out
 
