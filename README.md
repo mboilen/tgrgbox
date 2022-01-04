@@ -128,3 +128,10 @@ If you need to forward ports, forward
 |rtmp           | 1935           |
 |webrtc relay   | 3478           |
 |ICE candidates | 10000-10005/udp|
+
+## Azure DNS
+Rather than messing with Azure DNS, you can give you VM a host name.  Follow the steps in:
+
+https://docs.microsoft.com/en-us/azure/virtual-machines/create-fqdn
+
+To give your VM a hostname.  Then create an ALIAS record in your DNS provider that points to that name.  Create the CNAME records as described above and you can use your DNS provider's API to handle ACME through Traefik.
