@@ -69,7 +69,7 @@ sudo apt install npm
 Copy `stack/env.template` and `tgrgbace.tv/env.template` and fill in the appropriate secrets.  AUTH_WHITELIST is a comma separated list of email addresses that are allowed.  You can use `scripts/members` to produce that list.
 
 ## Configure OvenMediaEngine
-Edit `stack/ovenmediaengine/origin_conf/Server.xml`.  Under `<VirtualHosts>`, set up the `<Names>` list to be the correct names for your hostnames (all three of them).
+Copy `stack/ovenmediaengine/origin_conf/Server.xml.template to Server.xml and edit it`.  Under `<VirtualHosts>`, set up the `<Names>` list to be the correct names for your hostnames (all three of them).
 
 In `<SignedPolicy>` replace `[[secretkey]]` with your real secret key.
 
