@@ -1,0 +1,7 @@
+---
+# Run ansible-galaxy install geerlingguy.docker
+- name: Install docker
+  hosts: localhost
+  become: true
+  roles:
+    - geerlingguy.docker
