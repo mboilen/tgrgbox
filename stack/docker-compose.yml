@@ -52,6 +52,7 @@ services:
     environment:
      - NGINX_HOST=tgrgbace.home.mgb.monster
      - NGINX_PORT=80
+    restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.web.rule=Host(`${TGRGBACE_HOSTNAME}`)"
@@ -95,7 +96,7 @@ services:
       - "traefik.http.routers.traefik.service=api@internal"
 
       #uncomment to enable traefik dashboard
-      #- "traefik.http.routers.traefik.rule=Host(`dashboard.${TGRGBACE_HOSTNAME}`)"
+#     - "traefik.http.routers.traefik.rule=Host(`dashboard.${TGRGBACE_HOSTNAME}`)"
 
 # whoami:
 #   container_name: whoami
@@ -131,6 +132,7 @@ services:
       - "traefik.http.services.traefik-forward-auth.loadbalancer.server.port=4181"
   discord-user-proxy:
     image: mboilen/discord-user-proxy
+    restart: unless-stopped
     container_name: discord-user-proxy
     restart: unless-stopped
     labels:
