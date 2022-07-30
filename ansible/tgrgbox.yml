@@ -1,7 +1,94 @@
 ---
-# Run ansible-galaxy install geerlingguy.docker
-- name: Install docker
+- name: tgrgbox setup
   hosts: localhost
-  become: true
-  roles:
-    - geerlingguy.docker
+  remote_user: root
+  vars_files: 
+    - config.yml
+
+  tasks:
+  - name: Install docker
+    become: true
+    ansible.builtin.package:
+      name: docker
+      state: latest
+  - name: Install ansible
+    ansible.builtin.package:
+      name: ansible
+      state: latest
+  - name: Create directory
+    ansible.builtin.file:
+      path: "{{ tgrgbox_dest_dir }}"
+      state: directory
+      recurse: yes
+  - name: Create .env file
+    ansible.builtin.template:
+      src: templates/env.j2
+      dest: "{{ tgrgbox_dest_dir }}/.env"
+      mode: u=rw
+  - name: Create docker-compose file
+    ansible.builtin.template:
+      src: templates/docker-compose.yml.j2
+      dest: "{{ tgrgbox_dest_dir }}/docker-compose.yml"
+  - name: create Oven Media Engine directory
+    ansible.builtin.file:
+      path: "{{ tgrgbox_dest_dir }}/ovenmediaengine"
+      state: directory
+  - name: create Oven Media Engine logs directory
+    ansible.builtin.file:
+      path: "{{ tgrgbox_dest_dir }}/ovenmediaengine/logs"
+      state: directory
+  - name: create Oven Media Engine config directory
+    ansible.builtin.file:
+      path: "{{ tgrgbox_dest_dir }}/ovenmediaengine/origin_conf"
+      state: directory
+  - name: setup Oven Media Engine config
+    ansible.builtin.template:
+      src: templates/Server.xml.j2
+      dest: "{{ tgrgbox_dest_dir }}/ovenmediaengine/origin_conf/Server.xml"
+  - name: create Traefik directory
+    ansible.builtin.file:
+      path: "{{ tgrgbox_dest_dir }}/traefik"
+      state: directory
+  - name: create Traefik config directory
+    ansible.builtin.file:
+      path: "{{ tgrgbox_dest_dir }}/traefik/config"
+      state: directory
+  - name: create Traefik logs directory
+    ansible.builtin.file:
+      path: "{{ tgrgbox_dest_dir }}/traefik/logs"
+      state: directory
+  - name: create Traefik data directory
+    ansible.builtin.file:
+      path: "{{ tgrgbox_dest_dir }}/traefik/data"
+      state: directory
+  - name: create Traefik acme file
+    ansible.builtin.file:
+      path: "{{ tgrgbox_dest_dir }}/traefik/data/acme.json"
+      state: touch
+      mode: "600"
+  - name: create Traefik config.yml
+    ansible.builtin.template:
+      src: templates/config.yml.j2
+      dest: "{{ tgrgbox_dest_dir }}/traefik/config/config.yml"
+  - name: create Traefik traefik.yml
+    ansible.builtin.template:
+      src: templates/traefik.yml.j2
+      dest: "{{ tgrgbox_dest_dir }}/traefik/config/traefik.yml"
+  - name: create www root
+    ansible.builtin.file:
+      path: "{{ tgrgbox_dest_dir }}/html"
+      state: directory
+  - name: create tgrgbace.tv log file
+    ansible.builtin.file:
+      path: "{{ tgrgbace_tv_log }}"
+      state: touch
+      mode: "600"
+  - name: generate tgrgbox.tv
+    ansible.builtin.shell:
+      chdir: "{{playbook_dir}}/../tgrgbace.tv"
+      cmd: "HMAC_KEY={{ome_secret_key}} HOSTNAME={{tgrgbox_hostname}} npm install > {{ tgrgbace_tv_log }}"
+  - name: copy tgrgbox.tv
+    ansible.builtin.copy:
+      src: "{{playbook_dir}}/../tgrgbace.tv/dist/"
+      dest: "{{ tgrgbox_dest_dir }}/html"
+

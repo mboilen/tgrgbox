@@ -1,0 +1,144 @@
+version: "3.7"
+
+services:
+  ovenmediaengine:
+    container_name: ovenmediaengine
+    image: airensoft/ovenmediaengine:0.12.9
+    ports:
+      - "1935:1935/tcp"
+      - "3478:3478/tcp"
+      - "10000-10005:10000-10005/udp"
+    environment:
+      - OME_ORIGIN_PORT=9000
+      - OME_RTMP_PROV_PORT=1935
+      - OME_SRT_PROV_PORT=9999
+      - OME_MPEGTS_PROV_PORT=4000-4005/udp
+      - OME_HLS_STREAM_PORT=80
+      - OME_DASH_STREAM_PORT=80
+      - OME_SIGNALLING_PORT=80
+      - OME_TCP_RELAY_ADDRESS=*:3478
+      - OME_ICE_CANDIDATES=*:10000-10005/udp
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - ./ovenmediaengine/origin_conf:/opt/ovenmediaengine/bin/origin_conf
+      - ./ovenmediaengine/logs:/var/log/ovenmediaengine
+    restart: unless-stopped
+    command: /opt/ovenmediaengine/bin/OvenMediaEngine -c /opt/ovenmediaengine/bin/origin_conf
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.omewss.rule=Host(`wss.${TGRGBACE_HOSTNAME}`)"
+      - "traefik.http.routers.omewss.tls=true"
+      - "traefik.http.routers.omewss.service=omewss"
+      - "traefik.http.services.omewss.loadbalancer.server.port=3333"
+      - "traefik.http.services.omewss.loadbalancer.passHostHeader=true"
+      - "traefik.http.routers.omewss.middlewares=sslheader"
+      - "traefik.http.middlewares.sslheader.headers.contentSecurityPolicy=upgrade-insecure-requests"
+      - "traefik.http.middlewares.sslheader.headers.customResponseHeaders.Content-Security-Policy=upgrade-insecure-requests"
+      - "traefik.http.middlewares.sslheader.headers.customResponseHeaders.Content-Security-Policy-Report-Only=upgrade-insecure-requests"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https,wss"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.Connection=upgrade"
+      - "traefik.http.routers.omehls.rule=Host(`hls.${TGRGBACE_HOSTNAME}`)"
+      - "traefik.http.routers.omehls.tls=true"
+      - "traefik.http.services.omehls.loadbalancer.server.port=80"
+      - "traefik.http.routers.omehls.service=omehls"
+  web:
+    image: nginx
+    container_name: web
+    volumes:
+     - ./html:/usr/share/nginx/html
+       #ports:
+       #- "8888:80"
+    restart: unless-stopped
+    environment:
+     - NGINX_HOST=tgrgbace.home.mgb.monster
+     - NGINX_PORT=80
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.web.rule=Host(`${TGRGBACE_HOSTNAME}`)"
+      - "traefik.http.routers.web.tls=true"
+      - "traefik.http.services.web.loadbalancer.server.port=80"
+      - "traefik.http.routers.web.middlewares=traefik-forward-auth"
+
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - {{traefik_dns_challenge_api_key_string}}
+      - {{traefik_dns_challenge_secret_key_string}}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/config/traefik.yml:/traefik.yml:ro
+      - ./traefik/data/acme.json:/acme.json
+      - ./traefik/config/config.yml:/config.yml:ro
+      - ./traefik/logs:/logs
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.https_redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.https_redirect.redirectscheme.permanent=true"
+      - "traefik.http.routers.http_catchall.rule=HostRegexp(`{any:.+}`)"
+      - "traefik.http.routers.http_catchall.entrypoints=http"
+      - "traefik.http.routers.http_catchall.middlewares=https_redirect"
+      - "traefik.http.routers.traefik.entrypoints=https"
+
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.routers.traefik.tls.certresolver=myresolver"
+      - "traefik.http.routers.traefik.tls.domains[0].main=${TGRGBACE_HOSTNAME}"
+      - "traefik.http.routers.traefik.tls.domains[0].sans=*.${TGRGBACE_HOSTNAME}"
+      - "traefik.http.routers.traefik.service=api@internal"
+
+      #uncomment to enable traefik dashboard
+#     - "traefik.http.routers.traefik.rule=Host(`dashboard.${TGRGBACE_HOSTNAME}`)"
+
+# whoami:
+#   container_name: whoami
+#   image: containous/whoami
+#   labels:
+#     - "traefik.enable=true"
+#     - "traefik.http.routers.whoami.entrypoints=https"
+#     - "traefik.http.routers.whoami.tls=true"
+#     - "traefik.http.routers.whoami.rule=Host(`whoami.${TGRGBACE_HOSTNAME}`)"
+#     - "traefik.http.routers.whoami.middlewares=traefik-forward-auth"
+
+  traefik-forward-auth:
+    image: thomseddon/traefik-forward-auth:2
+    container_name: traefik-forward-auth
+    restart: unless-stopped
+    environment:
+      - DEFAULT_PROVIDER=generic-oauth
+      - PROVIDERS_GENERIC_OAUTH_CLIENT_ID=${AUTH_PROVIDERS_GENERIC_OAUTH_CLIENT_ID}
+      - PROVIDERS_GENERIC_OAUTH_CLIENT_SECRET=${AUTH_PROVIDERS_GENERIC_OAUTH_CLIENT_SECRET}
+      - PROVIDERS_GENERIC_OAUTH_AUTH_URL=https://discord.com/api/oauth2/authorize
+      - PROVIDERS_GENERIC_OAUTH_TOKEN_URL=https://discord.com/api/oauth2/token
+        #- PROVIDERS_GENERIC_OAUTH_USER_URL=https://discord.com/api/users/@me
+      - PROVIDERS_GENERIC_OAUTH_USER_URL=http://discord-user-proxy:80/
+      - PROVIDERS_GENERIC_OAUTH_SCOPE=identify
+      - SECRET=${AUTH_SECRET}
+      - INSECURE_COOKIE=false # Example assumes no https, do not use in production
+      - WHITELIST=${AUTH_WHITELIST}
+        #- LOG_LEVEL=debug
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://traefik-forward-auth:4181"
+      - "traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders=X-Forwarded-User"
+      - "traefik.http.services.traefik-forward-auth.loadbalancer.server.port=4181"
+  discord-user-proxy:
+    image: mboilen/discord-user-proxy
+    restart: unless-stopped
+    container_name: discord-user-proxy
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=false"
+    
+
+networks:
+  default:
+    name: tgrgbace-network
+
