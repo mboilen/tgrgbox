@@ -41,10 +41,14 @@
     ansible.builtin.file:
       path: "{{ tgrgbox_dest_dir }}/ovenmediaengine/origin_conf"
       state: directory
-  - name: setup Oven Media Engine config
+  - name: setup Oven Media Engine Server config
     ansible.builtin.template:
       src: templates/Server.xml.j2
       dest: "{{ tgrgbox_dest_dir }}/ovenmediaengine/origin_conf/Server.xml"
+  - name: setup Oven Media Engine Logging Config
+    ansible.builtin.template:
+      src: templates/Logger.xml.j2
+      dest: "{{ tgrgbox_dest_dir }}/ovenmediaengine/origin_conf/Logger.xml"
   - name: create Traefik directory
     ansible.builtin.file:
       path: "{{ tgrgbox_dest_dir }}/traefik"
