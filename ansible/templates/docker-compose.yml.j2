@@ -3,7 +3,7 @@ version: "3.7"
 services:
   ovenmediaengine:
     container_name: ovenmediaengine
-    image: airensoft/ovenmediaengine:0.12.9
+    image: airensoft/ovenmediaengine:0.14.4
     ports:
       - "1935:1935/tcp"
       - "3478:3478/tcp"
@@ -19,7 +19,7 @@ services:
       - OME_TCP_RELAY_ADDRESS=*:3478
       - OME_ICE_CANDIDATES=*:10000-10005/udp
     volumes:
-      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
       - ./ovenmediaengine/origin_conf:/opt/ovenmediaengine/bin/origin_conf
       - ./ovenmediaengine/logs:/var/log/ovenmediaengine
     restart: unless-stopped
