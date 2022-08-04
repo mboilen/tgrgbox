@@ -14,8 +14,58 @@ server {
     # Load the Diffie-Hellman parameter.
     ssl_dhparam /etc/letsencrypt/dhparams/dhparam.pem;
 
+    auth_request /validate;
+
+	location = /validate {
+	  # forward the /validate request to Vouch Proxy
+	  proxy_pass http://vouch-proxy:9090/validate;
+
+	  # be sure to pass the original host header
+	  proxy_set_header Host $http_host;
+
+	  # Vouch Proxy only acts on the request headers
+	  proxy_pass_request_body off;
+	  proxy_set_header Content-Length "";
+
+	  # optionally add X-Vouch-User as returned by Vouch Proxy along with the request
+	  auth_request_set $auth_resp_x_vouch_user $upstream_http_x_vouch_user;
+
+	  # these return values are used by the @error401 call
+	  auth_request_set $auth_resp_jwt $upstream_http_x_vouch_jwt;
+	  auth_request_set $auth_resp_err $upstream_http_x_vouch_err;
+	  auth_request_set $auth_resp_failcount $upstream_http_x_vouch_failcount;
+	}
+
+	# if validate returns `401 not authorized` then forward the request to the error401block
+	error_page 401 = @error401;
+
+	location @error401 {
+		# redirect to Vouch Proxy for login
+		return 302 http://vouch.{{tgrgbox_hostname}}/login?url=$scheme://$http_host$request_uri&vouch-failcount=$auth_resp_failcount&X-Vouch-Token=$auth_resp_jwt&error=$auth_resp_err;
+		# you usually *want* to redirect to Vouch running behind the same Nginx config proteced by https
+		# but to get started you can just forward the end user to the port that vouch is running on
+	}
+
     location / {
+        auth_request /validate;
         root /usr/share/nginx/html;
+    }
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name vouch.{{tgrgbox_hostname}};
+
+    ssl_certificate         /etc/letsencrypt/live/{{tgrgbox_hostname}}/fullchain.pem;
+    ssl_certificate_key     /etc/letsencrypt/live/{{tgrgbox_hostname}}/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/{{tgrgbox_hostname}}/chain.pem;
+    ssl_dhparam /etc/letsencrypt/dhparams/dhparam.pem;
+
+
+    location / {
+        proxy_pass http://vouch-proxy:9090;
+        proxy_set_header Host $host;
     }
 }
 
@@ -26,9 +76,9 @@ server {
     server_name wss.{{tgrgbox_hostname}};
     server_name hls.{{tgrgbox_hostname}};
 
-    ssl_certificate         /etc/letsencrypt/live/test-name/fullchain.pem;
-    ssl_certificate_key     /etc/letsencrypt/live/test-name/privkey.pem;
-    ssl_trusted_certificate /etc/letsencrypt/live/test-name/chain.pem;
+    ssl_certificate         /etc/letsencrypt/live/{{tgrgbox_hostname}}/fullchain.pem;
+    ssl_certificate_key     /etc/letsencrypt/live/{{tgrgbox_hostname}}/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/{{tgrgbox_hostname}}/chain.pem;
     ssl_dhparam /etc/letsencrypt/dhparams/dhparam.pem;
 
     location / {
@@ -42,6 +92,9 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Host $server_name;
+        auth_request_set $auth_resp_x_vouch_user $upstream_http_x_vouch_user;
+        auth_request_set $auth_resp_x_vouch_idp_claims_groups $upstream_http_x_vouch_idp_claims_groups;
+        auth_request_set $auth_resp_x_vouch_idp_claims_given_name $upstream_http_x_vouch_idp_claims_given_name;
     }
 
 

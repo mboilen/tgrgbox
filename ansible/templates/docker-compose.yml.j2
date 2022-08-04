@@ -8,8 +8,6 @@ services:
       - "1935:1935/tcp"
       - "3478:3478/tcp"
       - "4000:4000/udp"
-      #- "3333:3333/udp"
-      #- "3334:3334/udp"
       - "9000:9000"
       - "9999:9999/udp"
       - "10000-10005:10000-10005/udp"
@@ -42,32 +40,30 @@ services:
      - "443:443"
     restart: unless-stopped
     environment:
-     - NGINX_HOST=tgrgbace.mgb.monster
-     - CERTBOT_EMAIL={{letsencrypt_email}}
+     - NGINX_HOST={{tgrgbox_hostname}}
+     - CERTBOT_EMAIL=mgb@alumni.brown.edu
 #     - STAGING=1
     restart: unless-stopped
-
-  traefik-forward-auth:
-    image: thomseddon/traefik-forward-auth:2
-    container_name: traefik-forward-auth
-    restart: unless-stopped
+  
+  vouch-proxy:
+    image: quay.io/vouch/vouch-proxy:0.37.0
+    container_name: vouch-proxy
     environment:
-      - DEFAULT_PROVIDER=generic-oauth
-      - PROVIDERS_GENERIC_OAUTH_CLIENT_ID=${AUTH_PROVIDERS_GENERIC_OAUTH_CLIENT_ID}
-      - PROVIDERS_GENERIC_OAUTH_CLIENT_SECRET=${AUTH_PROVIDERS_GENERIC_OAUTH_CLIENT_SECRET}
-      - PROVIDERS_GENERIC_OAUTH_AUTH_URL=https://discord.com/api/oauth2/authorize
-      - PROVIDERS_GENERIC_OAUTH_TOKEN_URL=https://discord.com/api/oauth2/token
-        #- PROVIDERS_GENERIC_OAUTH_USER_URL=https://discord.com/api/users/@me
-      - PROVIDERS_GENERIC_OAUTH_USER_URL=http://discord-user-proxy:80/
-      - PROVIDERS_GENERIC_OAUTH_SCOPE=identify
-      - SECRET=${AUTH_SECRET}
-      - INSECURE_COOKIE=false # Example assumes no https, do not use in production
-      - WHITELIST=${AUTH_WHITELIST}
-        #- LOG_LEVEL=debug
+      - OAUTH_PROVIDER=oidc
+      - OAUTH_CLIENT_ID=${AUTH_PROVIDERS_GENERIC_OAUTH_CLIENT_ID}
+      - OAUTH_CLIENT_SECRET=${AUTH_PROVIDERS_GENERIC_OAUTH_CLIENT_SECRET}
+      - OAUTH_CALLBACK_URL=https://vouch.{{tgrgbox_hostname}}/auth
+      - VOUCH_DOMAINS={{tgrgbox_hostname}},discord.com
+      - OAUTH_USER_INFO_URL=http://discord-user-proxy:80/
+      - OAUTH_AUTH_URL=https://discord.com/api/oauth2/authorize
+      - OAUTH_TOKEN_URL=https://discord.com/api/oauth2/token
+      - OAUTH_SCOPES=identify
+#      - VOUCH_LOGLEVEL=debug
+#      - VOUCH_TESTING=true
+      - VOUCH_WHITELIST=${AUTH_WHITELIST}
 
   discord-user-proxy:
     image: mboilen/discord-user-proxy
-    restart: unless-stopped
     container_name: discord-user-proxy
     restart: unless-stopped
     
