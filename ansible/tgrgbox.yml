@@ -49,39 +49,22 @@
     ansible.builtin.template:
       src: templates/Logger.xml.j2
       dest: "{{ tgrgbox_dest_dir }}/ovenmediaengine/origin_conf/Logger.xml"
-  - name: create Traefik directory
-    ansible.builtin.file:
-      path: "{{ tgrgbox_dest_dir }}/traefik"
-      state: directory
-  - name: create Traefik config directory
-    ansible.builtin.file:
-      path: "{{ tgrgbox_dest_dir }}/traefik/config"
-      state: directory
-  - name: create Traefik logs directory
-    ansible.builtin.file:
-      path: "{{ tgrgbox_dest_dir }}/traefik/logs"
-      state: directory
-  - name: create Traefik data directory
-    ansible.builtin.file:
-      path: "{{ tgrgbox_dest_dir }}/traefik/data"
-      state: directory
-  - name: create Traefik acme file
-    ansible.builtin.file:
-      path: "{{ tgrgbox_dest_dir }}/traefik/data/acme.json"
-      state: touch
-      mode: "600"
-  - name: create Traefik config.yml
-    ansible.builtin.template:
-      src: templates/config.yml.j2
-      dest: "{{ tgrgbox_dest_dir }}/traefik/config/config.yml"
-  - name: create Traefik traefik.yml
-    ansible.builtin.template:
-      src: templates/traefik.yml.j2
-      dest: "{{ tgrgbox_dest_dir }}/traefik/config/traefik.yml"
   - name: create www root
     ansible.builtin.file:
       path: "{{ tgrgbox_dest_dir }}/html"
       state: directory
+  - name: create nginx config root
+    ansible.builtin.file:
+      path: "{{ tgrgbox_dest_dir }}/nginx_conf.d"
+      state: directory
+  - name: create certbot root
+    ansible.builtin.file:
+      path: "{{ tgrgbox_dest_dir }}/nginx_secrets"
+      state: directory
+  - name: create nginx tgrgbox config
+    ansible.builtin.template:
+      src: templates/tgrgbox.conf.j2
+      dest: "{{ tgrgbox_dest_dir }}/nginx_conf.d/tgrgbox.conf"
   - name: create tgrgbace.tv log file
     ansible.builtin.file:
       path: "{{ tgrgbace_tv_log }}"
