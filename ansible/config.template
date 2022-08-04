@@ -6,8 +6,6 @@ discord_secret_id: ""
 auth_secret: ""
 tgrgbox_hostname: ""
 tgrgbox_dest_dir: "~/tgrgbox"
-traefik_dns_challenge_api_key_string: "PORKBUN_API_KEY="
-traefik_dns_challenge_secret_key_string: "PORKBUN_SECRET_API_KEY="
 #A random string.  Avoid xml metacharacters please
 ome_secret_key: ""
 letsencrypt_email: ""
