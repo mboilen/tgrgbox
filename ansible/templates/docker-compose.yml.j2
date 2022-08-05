@@ -50,9 +50,10 @@ services:
     container_name: vouch-proxy
     environment:
       - OAUTH_PROVIDER=oidc
+      - VOUCH_DOCUMENT_ROOT=/vouch
       - OAUTH_CLIENT_ID=${AUTH_PROVIDERS_GENERIC_OAUTH_CLIENT_ID}
       - OAUTH_CLIENT_SECRET=${AUTH_PROVIDERS_GENERIC_OAUTH_CLIENT_SECRET}
-      - OAUTH_CALLBACK_URL=https://vouch.{{tgrgbox_hostname}}/auth
+      - OAUTH_CALLBACK_URL=https://{{tgrgbox_hostname}}/vouch/auth
       - OAUTH_USER_INFO_URL=http://discord.com/api/users/@me
       - OAUTH_AUTH_URL=https://discord.com/api/oauth2/authorize
       - OAUTH_TOKEN_URL=https://discord.com/api/oauth2/token
