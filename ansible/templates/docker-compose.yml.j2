@@ -53,20 +53,19 @@ services:
       - OAUTH_CLIENT_ID=${AUTH_PROVIDERS_GENERIC_OAUTH_CLIENT_ID}
       - OAUTH_CLIENT_SECRET=${AUTH_PROVIDERS_GENERIC_OAUTH_CLIENT_SECRET}
       - OAUTH_CALLBACK_URL=https://vouch.{{tgrgbox_hostname}}/auth
-      - VOUCH_DOMAINS={{tgrgbox_hostname}},discord.com
-      - OAUTH_USER_INFO_URL=http://discord-user-proxy:80/
+      - OAUTH_USER_INFO_URL=http://discord.com/api/users/@me
       - OAUTH_AUTH_URL=https://discord.com/api/oauth2/authorize
       - OAUTH_TOKEN_URL=https://discord.com/api/oauth2/token
       - OAUTH_SCOPES=identify
 #      - VOUCH_LOGLEVEL=debug
 #      - VOUCH_TESTING=true
       - VOUCH_WHITELIST=${AUTH_WHITELIST}
-
-  discord-user-proxy:
-    image: mboilen/discord-user-proxy
-    container_name: discord-user-proxy
-    restart: unless-stopped
-    
+#This allows us to accept any email address but still validate against user names
+      - VOUCH_DOMAINS={{tgrgbox_hostname}}
+      - VOUCH_COOKIE_DOMAIN={{tgrgbox_hostname}}
+      #Set the cookies to last for 12 hours
+      - VOUCH_COOKIE_MAXAGE=720
+      - VOUCH_JWT_MAXAGE=720
 
 networks:
   default:
