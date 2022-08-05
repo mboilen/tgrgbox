@@ -40,7 +40,7 @@ echo \
 Update apt and install docker
 ```
 sudo apt-get update
- sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose
 ```
  
  Add current user to docker group:
@@ -79,8 +79,11 @@ Copy `ansible/config.template` to `ansible/config.yml` and fill in the informati
 |tgrgbace_tv_log| A path to a log file that will contain the streamer secrets for the player|
 
 ## Run ansible to generate your install
-```cd ansible
-ansible-playbook tgrgbox.yml```
+
+```
+cd ansible
+ansible-playbook tgrgbox.yml
+```
 
 ## Run the docker stack
 cd into the tgrgbox_dest_dir and run
