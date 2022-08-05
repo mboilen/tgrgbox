@@ -109,7 +109,7 @@ Stream Key: stream?policy=blah&signature=blahblah
 ## Port Forwarding
 If you need to forward ports, forward
 |Service        | Port           |
-|:--------------|---------------:|
+|---------------|----------------|
 |http           | 80             |
 |https          | 443            |
 |rtmp           | 1935           |
