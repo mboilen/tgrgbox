@@ -70,21 +70,13 @@ Copy `ansible/config.template` to `ansible/config.yml` and fill in the informati
 | Config Key | Value |
 |------------|-------|
 |auth_whitelist | A comma separated list of Discord user names (without discriminator) that are allowed to access the player|
-|---|---|
 |discord_client_id | The client id from the Discord OAuth2 app|
-|---|----|
 |discord_secret_id | The client secret from the Discord OAuth2 app|
-|---|---|
 |tgrgbox_hostname| The base hostname for your tgrgbox instance (the player is at https://tgrgbox_hostname)|
-|---|---|
 |tgrgbox_dest_dir | The target directory for your tgrgbox instance.  Ansible will place all its files here |
-|---|---|
 |ome_secret_key| A random string that is used as the HMAC key to sign the Oven Media Engine security policies.  Avoid xml metacharacters in this string|
-|---|---|
 |letsencrypt_email| The email address that you'll use to get your certificates from LetsEncrypt|
-|---|---|
 |tgrgbace_tv_log| A path to a log file that will contain the streamer secrets for the player|
-|---|---|
 
 ## Run ansible to generate your install
 ```cd ansible
