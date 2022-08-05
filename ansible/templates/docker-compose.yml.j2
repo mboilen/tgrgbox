@@ -35,16 +35,16 @@ services:
     container_name: tgrgbox_nginx
     volumes:
      - ./html:/usr/share/nginx/html
-     - ./nginx_conf.d/:/etc/nginx/user_conf.d:ro
+     - ./nginx_conf.d/tgrgbox.conf:/etc/nginx/user_conf.d/10_tgrgbox.conf:ro
      - ./nginx_secrets:/etc/letsencrypt
-{% if expose_web_ports == true %}
+{% if host_nginx_config %}
+     - {{host_nginx_config}}:/etc/nginx/user_conf.d/00_host.conf:ro
+{% endif %}
     ports:
      - "80:80"
      - "443:443"
-{% endif %}
     restart: unless-stopped
     environment:
-     - NGINX_HOST={{tgrgbox_hostname}}
      - CERTBOT_EMAIL=mgb@alumni.brown.edu
 #     - STAGING=1
     restart: unless-stopped
@@ -75,5 +75,5 @@ services:
 
 networks:
   default:
-    name: tgrgbace-network
+    name: tgrgbox-network
 
