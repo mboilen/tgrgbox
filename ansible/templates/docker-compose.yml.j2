@@ -37,9 +37,11 @@ services:
      - ./html:/usr/share/nginx/html
      - ./nginx_conf.d/:/etc/nginx/user_conf.d:ro
      - ./nginx_secrets:/etc/letsencrypt
+{% if expose_web_ports == true %}
     ports:
      - "80:80"
      - "443:443"
+{% endif %}
     restart: unless-stopped
     environment:
      - NGINX_HOST={{tgrgbox_hostname}}

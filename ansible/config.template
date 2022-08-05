@@ -8,3 +8,4 @@ tgrgbox_dest_dir: "~/tgrgbox"
 ome_secret_key: ""
 letsencrypt_email: ""
 tgrgbace_tv_log: "~/tgrgbace.tv.log"
+expose_web_ports: true
