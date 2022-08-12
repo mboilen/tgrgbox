@@ -37,7 +37,7 @@ services:
      - ./html:/usr/share/nginx/html
      - ./nginx_conf.d/tgrgbox.conf:/etc/nginx/user_conf.d/10_tgrgbox.conf:ro
      - ./nginx_secrets:/etc/letsencrypt
-{% if host_nginx_config %}
+{% if host_nginx_config is defined %}
      - {{host_nginx_config}}:/etc/nginx/user_conf.d/00_host.conf:ro
 {% endif %}
     ports:
