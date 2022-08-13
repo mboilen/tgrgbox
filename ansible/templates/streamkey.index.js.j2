@@ -2,11 +2,12 @@
 const base64url = require('base64url') // you will probably have to add this package `npm i base64url`
 const crypto = require('crypto')
 const http = require('http')
+const querystring = require('querystring')
 
 const MS_PER_DAY = 60 * 60 * 24 * 1000
 
 var server = http.createServer(function (req, res) {
-  const HMAC_KEY                  = "${{ome_secret_key}}";
+  const HMAC_KEY                  = "{{ome_secret_key}}";
   const SIGNATURE_QUERY_KEY_NAME  = "signature"
   const POLICY_QUERY_KEY_NAME     = "policy"
   var expire = Date.now() + (60 * MS_PER_DAY);
@@ -14,11 +15,11 @@ var server = http.createServer(function (req, res) {
     "url_expire": expire
   };
 
-  let rtmpUrl = "rtmp://${{tgrgbox_hostname}}:1935/tgrgbace/stream";
-  let srtUrl = "srt://${{tgrgbox_hostname}}:9999/tgrgbace/stream";
+  let rtmpUrl = "rtmp://{{tgrgbox_hostname}}:1935/tgrgbace/stream";
+  let srtUrl = "srt://{{tgrgbox_hostname}}:9999/tgrgbace/stream";
 
   let rtmpSignedUrl = makePolicy(rtmpUrl);
-  let srtSignedUrl = makePolicy(srtUrl);
+  let srtSignedUrl = "srt://{{tgrgbox_hostname}}:9999?streamid=" + querystring.escape(makePolicy(srtUrl));
 
   res.setHeader("Content-Type", "text/html");
   res.writeHead("200");
