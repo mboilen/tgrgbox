@@ -75,7 +75,7 @@ services:
     restart: unless-stopped
 
   ome-streamkey:
-    image: node:18
+    image: node:18.7.0-bullseye
     container_name: ome-keygen
     volumes:
       - "./ome-keygen:/usr/src/app"
