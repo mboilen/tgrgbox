@@ -65,15 +65,26 @@
     ansible.builtin.template:
       src: templates/tgrgbox.conf.j2
       dest: "{{ tgrgbox_dest_dir }}/nginx_conf.d/tgrgbox.conf"
-  - name: create tgrgbace.tv log file
-    ansible.builtin.file:
-      path: "{{ tgrgbace_tv_log }}"
-      state: touch
-      mode: "600"
   - name: generate tgrgbox.tv
     ansible.builtin.shell:
       chdir: "{{playbook_dir}}/../tgrgbace.tv"
-      cmd: "HMAC_KEY={{ome_secret_key}} HOSTNAME={{tgrgbox_hostname}} npm install > {{ tgrgbace_tv_log }}"
+      cmd: "HMAC_KEY={{ome_secret_key}} HOSTNAME={{tgrgbox_hostname}} npm install"
+  - name: create streamkey root
+    ansible.builtin.file:
+      path: "{{ tgrgbox_dest_dir }}/ome-keygen"
+      state: directory
+  - name: generate streamkey index.js
+    ansible.builtin.template:
+      src: templates/streamkey.index.js.j2
+      dest: "{{ tgrgbox_dest_dir }}/ome-keygen/index.js"
+  - name: generate streamkey package.json
+    ansible.builtin.template:
+      src: templates/streamkey.package.json.j2
+      dest: "{{ tgrgbox_dest_dir }}/ome-keygen/package.json"
+  - name: run npm install for streamkey
+    ansible.builtin.shell:
+      chdir: "{{ tgrgbox_dest_dir }}/ome-keygen"
+      cmd: "npm install"
   - name: copy tgrgbox.tv
     ansible.builtin.copy:
       src: "{{playbook_dir}}/../tgrgbace.tv/dist/"

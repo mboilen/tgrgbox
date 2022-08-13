@@ -73,6 +73,17 @@ services:
       - VOUCH_COOKIE_MAXAGE=720
       - VOUCH_JWT_MAXAGE=720
 
+  ome-streamkey:
+    image: node:18
+    container_name: ome-keygen
+    volumes:
+      - "./ome-keygen:/usr/src/app"
+    working_dir: "/usr/src/app"
+    entrypoint: "npm start"
+    restart: unless-stopped
+
+  
+
 networks:
   default:
     name: tgrgbox-network

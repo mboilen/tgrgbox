@@ -60,9 +60,10 @@ function createSources() {
     let streamerPolicyBase64 = base64url(Buffer.from(streamerPolicy, 'utf8'));
     let viewerPolicyBase64 = base64url(Buffer.from(viewerPolicy, 'utf8'));
 
-    var policies = {};
-    makePolicy(policies, 'webrtc', HMAC_KEY, 'wss://' + HOSTNAME + "/ome-wss/tgrgbace/stream", 'ws://' + HOSTNAME + ":3333/tgrgbace/stream", viewerPolicyBase64);
-    makePolicy(policies, 'hls', HMAC_KEY, 'https://' + HOSTNAME + "/ome-hls/tgrgbace/stream/llhls.m3u8", 'http://' + HOSTNAME + ":3333/tgrgbace/stream/llhls.m3u8", viewerPolicyBase64);
+    var policies = {
+	    "webrtc": "wss://" + HOSTNAME + "/ome-wss/tgrgbace/stream",
+            "hls": "https://" + HOSTNAME + "/ome-hls/tgrgbace/stream/llhls.m3u8"
+    };
     //no longer supported
     //makePolicy(policies, 'dash-ll', HMAC_KEY, 'https://hls.' + HOSTNAME + "/tgrgbace/stream/manifest_ll.mpd", 'http://hls.' + HOSTNAME + ":80/tgrgbace/stream/manifest_ll.mpd", viewerPolicyBase64);
 

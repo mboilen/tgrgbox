@@ -32,6 +32,11 @@ server {
         auth_request_set $auth_resp_failcount $upstream_http_x_vouch_failcount;
     }
 
+    location /streamkey {
+        auth_request /vouch/validate;
+        proxy_pass http://ome-keygen:8080;
+    }
+
     # if validate returns `401 not authorized` then forward the request to the error401block
     error_page 401 = @error401;
 
@@ -42,6 +47,7 @@ server {
     }
 
     location ~^/(?:ome-wss|ome-hls) {
+        auth_request /vouch/validate;
         rewrite ^/(?:ome-wss|ome-hls)/(.+) /$1 break;
         proxy_pass http://ovenmediaengine:3333;
         proxy_set_header Upgrade $http_upgrade;
