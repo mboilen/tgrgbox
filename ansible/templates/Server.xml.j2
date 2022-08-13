@@ -174,8 +174,6 @@
             <Host>
                 <Names>
                     <Name>{{tgrgbox_hostname}}</Name>
-                    <Name>wss.{{tgrgbox_hostname}}</Name>
-                    <Name>hls.{{tgrgbox_hostname}}</Name>
                 </Names>
                 <!--
                 <TLS>
@@ -194,7 +192,7 @@
 
                 <Enables>
                     <Providers>rtmp,webrtc,srt</Providers>
-                    <Publishers>webrtc,hls,llhls,dash,lldash</Publishers>
+		    <!--<Publishers>webrtc,hls,llhls,dash,lldash</Publishers>-->
                 </Enables>
             </SignedPolicy>
 

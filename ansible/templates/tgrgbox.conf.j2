@@ -41,25 +41,8 @@ server {
 
     }
 
-    location / {
-        auth_request /vouch/validate;
-        root /usr/share/nginx/html;
-    }
-}
-
-server {
-    listen 443 ssl;
-    listen [::]:443 ssl;
-
-    server_name wss.{{tgrgbox_hostname}};
-    server_name hls.{{tgrgbox_hostname}};
-
-    ssl_certificate         /etc/letsencrypt/live/{{tgrgbox_hostname}}/fullchain.pem;
-    ssl_certificate_key     /etc/letsencrypt/live/{{tgrgbox_hostname}}/privkey.pem;
-    ssl_trusted_certificate /etc/letsencrypt/live/{{tgrgbox_hostname}}/chain.pem;
-    ssl_dhparam /etc/letsencrypt/dhparams/dhparam.pem;
-
-    location / {
+    location ~^/(?:ome-wss|ome-hls) {
+        rewrite ^/(?:ome-wss|ome-hls)/(.+) /$1 break;
         proxy_pass http://ovenmediaengine:3333;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -75,7 +58,10 @@ server {
         auth_request_set $auth_resp_x_vouch_idp_claims_given_name $upstream_http_x_vouch_idp_claims_given_name;
     }
 
-
+    location / {
+        auth_request /vouch/validate;
+        root /usr/share/nginx/html;
+    }
 }
 
 server {
