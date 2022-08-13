@@ -62,7 +62,7 @@ function createSources() {
 
     var policies = {};
     makePolicy(policies, 'webrtc', HMAC_KEY, 'wss://wss.' + HOSTNAME + "/tgrgbace/stream", 'ws://wss.' + HOSTNAME + ":3333/tgrgbace/stream", viewerPolicyBase64);
-    makePolicy(policies, 'hls', HMAC_KEY, 'https://hls.' + HOSTNAME + "/tgrgbace/stream/llhls.m3u8", 'http://hls.' + HOSTNAME + ":80/tgrgbace/stream/playlist.m3u8", viewerPolicyBase64);
+    makePolicy(policies, 'hls', HMAC_KEY, 'https://hls.' + HOSTNAME + "/tgrgbace/stream/llhls.m3u8", 'http://hls.' + HOSTNAME + ":3333/tgrgbace/stream/llhls.m3u8", viewerPolicyBase64);
     //no longer supported
     //makePolicy(policies, 'dash-ll', HMAC_KEY, 'https://hls.' + HOSTNAME + "/tgrgbace/stream/manifest_ll.mpd", 'http://hls.' + HOSTNAME + ":80/tgrgbace/stream/manifest_ll.mpd", viewerPolicyBase64);
 
