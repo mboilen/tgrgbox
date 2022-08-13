@@ -140,8 +140,6 @@ module.exports = {
                     to: 'ovenplayer/[name][ext]' },
                 { from: 'node_modules/hls.js/dist/hls.min.js',
                     to: 'deps/[name][ext]' }
-                //{ from: 'node_modules/dashjs/dist/dash.all.min.js',
-                //    to: 'deps/[name][ext]' }
             ]
         }),
     ],
