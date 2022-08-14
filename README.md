@@ -9,14 +9,13 @@ setup is at https://flinch.tgrgbace.tv, add a redirect for https://flinch.tgrgba
 More info at: https://discord.com/developers/docs/topics/oauth2
 
 ## DNS Setup
-You'll need to create a DNS record for your hostname as well as CNAMEs for:
-1. wss.HOSTNAME
-2. hls.HOSTNAME
+You'll need to create a DNS record for your hostname (say tgrgbox.com)
 
 ## Master List of secrets and information
 1. OAuth client id and secret id from your discord app
 2. OvenMediaEngine signing key - a random string.  Try to avoid xml metacharacters for your own sanity
-3. A list of discord user names addresses that are allowed to access the platform
+3. A list of discord user names that are allowed to access the platform
+4. A list of discord user names that are allowed to access the streaming key
 
 
 ## Install prerequesites
@@ -70,6 +69,7 @@ Copy `ansible/config.template` to `ansible/config.yml` and fill in the informati
 | Config Key | Value |
 |------------|-------|
 |auth_whitelist | A comma separated list of Discord user names (without discriminator) that are allowed to access the player|
+|keygen_auth_whitelist | A comma separated list of Discord user names (without discriminator) that are allowed to access the streaming keys|
 |discord_client_id | The client id from the Discord OAuth2 app|
 |discord_secret_id | The client secret from the Discord OAuth2 app|
 |tgrgbox_hostname| The base hostname for your tgrgbox instance (the player is at https://tgrgbox_hostname)|
@@ -97,12 +97,8 @@ Once that's done you should be able to navigate to https://tgrgbox_hostname
 
 ## Test it out
 
-Go to your hostname (i.e. https://flinch.tgrgbace.tv) and it should bring up the player page.  You can stream to it from OBS by using the URL produced by npm.  In your OBS configuration you'll need to split up the url:
+Go to your hostname (i.e. https://flinch.tgrgbace.tv) and it should bring up the player page.  Go to /streamkey (i.e. https://flinch.tgrgbace.tv/streamkey) for the streaming keys.  Plug them into OBS and test it out.
 
-```
-Server: rtmp://hostname:1935/tgrgbace
-Stream Key: stream?policy=blah&signature=blahblah
-```
 
 # Appendix
 
@@ -114,6 +110,7 @@ If you need to forward ports, forward
 |https          | 443            |
 |rtmp           | 1935           |
 |webrtc relay   | 3478           |
+|srt            | 9999           |
 |ICE candidates | 10000-10005/udp|
 
 ## Azure DNS
@@ -121,11 +118,11 @@ Rather than messing with Azure DNS, you can give you VM a host name.  Follow the
 
 https://docs.microsoft.com/en-us/azure/virtual-machines/create-fqdn
 
-To give your VM a hostname.  Then create an ALIAS record in your DNS provider that points to that name.  Create the CNAME records as described above and you can use your DNS provider's API to handle ACME through Traefik.
+To give your VM a hostname.  Then create an ALIAS record in your DNS provider that points to that name.  NGinx can then create the correct certificate
 
 ## Docker cheat sheet
 ```
 docker compose pull
-docker compose up -d --remove-orphans
+docker compose up -d --remove-orphans (add --force-recreate to force creation of containers so you don't have to worry about restarting containers)
 docker system prune -a --volumes
 ```
