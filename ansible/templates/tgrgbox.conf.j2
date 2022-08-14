@@ -34,6 +34,8 @@ server {
 
     location /streamkey {
         auth_request /vouch/validate;
+        auth_request_set $auth_resp_user $upstream_http_x_vouch_user;
+        proxy_set_header X-User $auth_resp_user;
         proxy_pass http://ome-keygen:8080;
     }
 

@@ -74,7 +74,7 @@ services:
       - VOUCH_JWT_MAXAGE=720
     restart: unless-stopped
 
-  ome-streamkey:
+  ome-keygen:
     image: node:18.7.0-bullseye
     container_name: ome-keygen
     volumes:

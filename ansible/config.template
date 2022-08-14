@@ -1,5 +1,6 @@
 ---
 auth_whitelist: ""
+keygen_auth_whitelist: ""
 discord_client_id: ""
 discord_secret_id: ""
 tgrgbox_hostname: ""

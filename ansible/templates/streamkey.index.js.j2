@@ -6,6 +6,8 @@ const querystring = require('querystring')
 
 const MS_PER_DAY = 60 * 60 * 24 * 1000
 
+let allowedUsers = "{{keygen_auth_whitelist}}".split(",").map(s => s.toUpperCase());
+
 var server = http.createServer(function (req, res) {
   const HMAC_KEY                  = "{{ome_secret_key}}";
   const SIGNATURE_QUERY_KEY_NAME  = "signature"
@@ -14,6 +16,18 @@ var server = http.createServer(function (req, res) {
   const POLICY                    = {
     "url_expire": expire
   };
+  let user = req.headers['x-user'];
+
+  if (!allowedUsers.includes(user.toUpperCase())) {
+    res.setHeader("Content-Type", "text/html");
+    res.writeHead("200");
+    var body = 
+      "<!DOCTYPE html><html lang=\"en\"><head><title>Oven Media Engine Streaming Keys</title></head><body><h1>Access Denied</h1>" +
+      user + " does not have access to the streaming keys";
+    res.end(body);
+    return;
+  }
+
 
   let rtmpUrl = "rtmp://{{tgrgbox_hostname}}:1935/tgrgbace/stream";
   let srtUrl = "srt://{{tgrgbox_hostname}}:9999/tgrgbace/stream";
