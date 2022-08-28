@@ -4,26 +4,19 @@ Go to https://discord.com/developers/applications and log in
 Create an application 
 
 Add redirects that match web endpoint for tgrgbace.  For example, if your tgrgbace
-setup is at https://flinch.tgrgbace.tv, add a redirect for https://flinch.tgrgbace.tv/_oauth.  You'll need these secrets for later.
+setup is at https://flinch.tgrgbace.tv, add a redirect for https://flinch.tgrgbace.tv/vouch/auth.  Save the OAuth2 secrets; you'll need these secrets for later.
 
 More info at: https://discord.com/developers/docs/topics/oauth2
 
 ## DNS Setup
-You'll need to create a DNS record for your hostname as well as CNAMEs for:
-1. wss.HOSTNAME
-2. hls.HOSTNAME
-
-Optionally you can create
-1. whoami.HOSTNAME - useful test service to look at the auth response (enable in docker-compose.yml)
-2. dashboard.HOSTNAME - traefik dashboard (enable in docker-compose.yml)
+You'll need to create a DNS record for your hostname (say tgrgbox.com)
 
 ## Master List of secrets and information
 1. OAuth client id and secret id from your discord app
-2. AUTH_SECRET - a random string
-3. OvenMediaEngine signing key - a random string.  Try to avoid xml metacharacters for your own sanity
-4. A list of discord email addresses that are allowed to access the platform
+2. OvenMediaEngine signing key - a random string.  Try to avoid xml metacharacters for your own sanity
+3. A list of discord user names that are allowed to access the platform
+4. A list of discord user names that are allowed to access the streaming key
 
-In addition you need everything necessary to configure a DNS Challenge provider for an ACME certificate resolver in Traefik: https://doc.traefik.io/traefik/https/acme/#dnschallenge
 
 ## Install prerequesites
 ### Install Docker
@@ -46,7 +39,7 @@ echo \
 Update apt and install docker
 ```
 sudo apt-get update
- sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose
 ```
  
  Add current user to docker group:
@@ -60,73 +53,64 @@ Log out and back in again to pick up the new group
 sudo apt install npm
 ```
 
+### Install ansible ###
+```
+sudo apt install ansible
+```
+
 # Installation
 
 ## Clone the git repo:
 ```git clone git@github.com:mboilen/tgrgbox.git```
 
-## Fill in .env files
-Copy `stack/env.template` and `tgrgbace.tv/env.template` and fill in the appropriate secrets.  AUTH_WHITELIST is a comma separated list of email addresses that are allowed.  You can use `scripts/members` to produce that list.
+## Fill in config.yml files
+Copy `ansible/config.template` to `ansible/config.yml` and fill in the information.
 
-## Configure OvenMediaEngine
-Copy `stack/ovenmediaengine/origin_conf/Server.xml.template to Server.xml and edit it`.  Under `<VirtualHosts>`, set up the `<Names>` list to be the correct names for your hostnames (all three of them).
+| Config Key | Value |
+|------------|-------|
+|auth_whitelist | A comma separated list of Discord user names (without discriminator) that are allowed to access the player|
+|keygen_auth_whitelist | A comma separated list of Discord user names (without discriminator) that are allowed to access the streaming keys|
+|discord_client_id | The client id from the Discord OAuth2 app|
+|discord_secret_id | The client secret from the Discord OAuth2 app|
+|tgrgbox_hostname| The base hostname for your tgrgbox instance (the player is at https://tgrgbox_hostname)|
+|tgrgbox_dest_dir | The target directory for your tgrgbox instance.  Ansible will place all its files here |
+|ome_secret_key| A random string that is used as the HMAC key to sign the Oven Media Engine security policies.  Avoid xml metacharacters in this string|
+|letsencrypt_email| The email address that you'll use to get your certificates from LetsEncrypt|
+|tgrgbace_tv_log| A path to a log file that will contain the streamer secrets for the player|
 
-In `<SignedPolicy>` replace `[[secretkey]]` with your real secret key.
+## Run ansible to generate your install
 
-## Configure Traefik
-Go into `stack/traefik/data` and execute:
 ```
-touch acme.json
-chmod 600 acme.json
+cd ansible
+ansible-playbook tgrgbox.yml
 ```
-
-This file must be mode 600 or it will be ignored by Traefik.
-
-Then, edit `stack/traefik/config/traefik.yml`.  Configure `myresolver` for your scenario:
-1. set your email address
-2. in the dnsChallenge section, set up your dns challenge provider as described in: https://doc.traefik.io/traefik/https/acme/#dnschallenge.  You can use staging/traefik/secrets to store api keys if necessary.
-3. You may also need to add environment variables to the traefik section of `stack/docker-compose.yml`.  This includes the secret files from step 2.
-4. You can uncomment `caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"` to use the CA staging server.  Let's Encrypt has a rate limit in the tens of certificates per week and the test server has no limit (the certificates don't validate but you can ensure it's providing a certificate.  This is a useful test to test out your end to end certificate signing story.  If you do this, you'll need to recreate acme.json when switching to the production server.
-
-## Generate player page
-``cd tgrgbace.tv
-npm install``
-
-This will generate the player page (complete with signed policy to view the stream) into `dist/`  Make note of the `rtmp streaming URL`.  Streamers will need this to stream.  When it finishes, run
-
-```cp -r dist/* ../stack/html```
-
-To copy the contents to the nginx root
 
 ## Run the docker stack
+cd into the tgrgbox_dest_dir and run
+```docker compose up -d``` 
+(or `docker-compose` if you're on an older version of docker compose)
 
-Before you start it up, I recommend uncommenting whoami and the traefik dashboard to help test/diagnose.  When you're ready, run
-```docker-compose up -d```
-from the stack directory
+It will take a little while to start up on the first time as tgrgbox_nginx generates a Diffie-Helman key and gets certificates with certbot.  You can monitor progress with
+```docker logs tgrgbox_nginx```
 
-Traefik can take eight to ten minutes to create the wildcard certificate.  You should immediately see the TXT records get created and some blob get put into acme.json.  Keep an eye on traefik/logs/traefik.log and the modstamp on acme.json to see when it completes (or fails).
-
-Chrome has an annoying behavior where it will continue to report a site as insecure even when it has a certificate if you previously visited it when it didn't.  If you open up an incognito window you'll see the correct certificate.  You may run into that when initially testing everything.  
+Once that's done you should be able to navigate to https://tgrgbox_hostname
 
 ## Test it out
 
-Go to your hostname (i.e. https://flinch.tgrgbace.tv) and it should bring up the player page.  You can stream to it from OBS by using the URL produced by npm.  In your OBS configuration you'll need to split up the url:
+Go to your hostname (i.e. https://flinch.tgrgbace.tv) and it should bring up the player page.  Go to /streamkey (i.e. https://flinch.tgrgbace.tv/streamkey) for the streaming keys.  Plug them into OBS and test it out.
 
-```
-Server: rtmp://hostname:1935/tgrgbace
-Stream Key: stream?policy=blah&signature=blahblah
-```
 
 # Appendix
 
 ## Port Forwarding
 If you need to forward ports, forward
 |Service        | Port           |
-|:--------------|---------------:|
+|---------------|----------------|
 |http           | 80             |
 |https          | 443            |
 |rtmp           | 1935           |
 |webrtc relay   | 3478           |
+|srt            | 9999           |
 |ICE candidates | 10000-10005/udp|
 
 ## Azure DNS
@@ -134,4 +118,11 @@ Rather than messing with Azure DNS, you can give you VM a host name.  Follow the
 
 https://docs.microsoft.com/en-us/azure/virtual-machines/create-fqdn
 
-To give your VM a hostname.  Then create an ALIAS record in your DNS provider that points to that name.  Create the CNAME records as described above and you can use your DNS provider's API to handle ACME through Traefik.
+To give your VM a hostname.  Then create an ALIAS record in your DNS provider that points to that name.  NGinx can then create the correct certificate
+
+## Docker cheat sheet
+```
+docker compose pull
+docker compose up -d --remove-orphans (add --force-recreate to force creation of containers so you don't have to worry about restarting containers)
+docker system prune -a --volumes
+```

@@ -1,0 +1,76 @@
+//Most of this is taken from https://raw.githubusercontent.com/AirenSoft/OvenMediaEngine/master/misc/signed_policy_url_generator.js
+const base64url = require('base64url') // you will probably have to add this package `npm i base64url`
+const crypto = require('crypto')
+const http = require('http')
+const querystring = require('querystring')
+
+const MS_PER_DAY = 60 * 60 * 24 * 1000
+
+let allowedUsers = "{{keygen_auth_whitelist}}".split(",").map(s => s.toUpperCase());
+
+var server = http.createServer(function (req, res) {
+  const HMAC_KEY                  = "{{ome_secret_key}}";
+  const SIGNATURE_QUERY_KEY_NAME  = "signature"
+  const POLICY_QUERY_KEY_NAME     = "policy"
+  var expire = Date.now() + (60 * MS_PER_DAY);
+  const POLICY                    = {
+    "url_expire": expire
+  };
+  let user = req.headers['x-user'];
+
+  if (!allowedUsers.includes(user.toUpperCase())) {
+    res.setHeader("Content-Type", "text/html");
+    res.writeHead("200");
+    var body = 
+      "<!DOCTYPE html><html lang=\"en\"><head><title>Oven Media Engine Streaming Keys</title></head><body><h1>Access Denied</h1>" +
+      user + " does not have access to the streaming keys";
+    res.end(body);
+    return;
+  }
+
+
+  let rtmpUrl = "rtmp://{{tgrgbox_hostname}}:1935/tgrgbace/stream";
+  let srtUrl = "srt://{{tgrgbox_hostname}}:9999/tgrgbace/stream";
+
+  let rtmpSignedUrl = makePolicy(rtmpUrl);
+  let srtSignedUrl = "srt://{{tgrgbox_hostname}}:9999?streamid=" + querystring.escape(makePolicy(srtUrl));
+
+  res.setHeader("Content-Type", "text/html");
+  res.writeHead("200");
+  var body = 
+  "<!DOCTYPE html><html lang=\"en\"><head><title>Oven Media Engine Streaming Keys</title></head><body><h1>Oven Media Engine Streaming Keys</h1>" +
+ "<h2>RTMP</h2><table><tr><td>Server:</td><td>" + rtmpUrl.substring(0, rtmpUrl.indexOf("stream")) + "</td></tr><tr><td>Stream Key:</td><td>" + rtmpSignedUrl.substring(rtmpUrl.indexOf("stream")) + "</td></tr></table>" +
+  "<h2>SRT</h2><table><tr><td>Server:</td><td>" + srtSignedUrl + "</td></tr><tr><td>Stream Key:</td><td>&lt;leave blank&gt;</td></tr></table>" + 
+  "<br>" +
+  "These keys are good until " + new Date(expire) +
+  "</table></body></html>";
+  res.end(body);
+
+  function makePolicy(baseUrl) {
+    // console.log('baseUrl:\t', baseUrl)
+
+    let policy = POLICY
+    // console.log('policy:\t\t',policy)
+
+    let policyBase64 = base64url(Buffer.from(JSON.stringify(policy),'utf8'))
+    // console.log('policyBase64:\t',policyBase64)
+
+    let qsSeperator = baseUrl.includes("?") ? "&" : "?";
+    let policyUrl =
+      baseUrl + qsSeperator + POLICY_QUERY_KEY_NAME + "=" + policyBase64;
+    // console.log('policyUrl:\t', policyUrl)
+
+    let signature = base64url(crypto.createHmac('sha1', HMAC_KEY).update(policyUrl).digest())
+    // console.log('signature:\t', signature)
+
+    let signedUrl = policyUrl + '&' + SIGNATURE_QUERY_KEY_NAME + '=' + signature
+    // console.log('signedUrl:\t', signedUrl)
+    return signedUrl;
+  }
+  });
+server.listen(8080, () => {
+  console.log(`Server is running on http://localhost:8080`);
+});
+
+
+

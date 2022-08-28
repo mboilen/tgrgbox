@@ -1,0 +1,91 @@
+version: "3.7"
+
+services:
+#https://hub.docker.com/r/airensoft/ovenmediaengine/tags
+  ovenmediaengine:
+    container_name: ovenmediaengine
+    image: airensoft/ovenmediaengine:0.14.8
+    ports:
+      - "1935:1935/tcp"
+      - "3478:3478/tcp"
+      - "4000:4000/udp"
+      - "9000:9000"
+      - "9999:9999/udp"
+      - "10000-10005:10000-10005/udp"
+    environment:
+      - OME_ORIGIN_PORT=9000
+      - OME_RTMP_PROV_PORT=1935
+      - OME_SRT_PROV_PORT=9999
+      - OME_MPEGTS_PROV_PORT=4000/udp
+      - OME_LLHLS_STREAM_PORT=3333
+      - OME_LLHLS_STREAM_TLS_PORT=3334
+      - OME_WEBRTC_SIGNALLING_PORT=3333
+      - OME_WEBRTC_SIGNALLING_TLS_PORT=3334
+      - OME_TCP_RELAY_ADDRESS=*:3478
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./ovenmediaengine/origin_conf:/opt/ovenmediaengine/bin/origin_conf
+      - ./ovenmediaengine/logs:/var/log/ovenmediaengine
+    restart: unless-stopped
+    command: /opt/ovenmediaengine/bin/OvenMediaEngine -c /opt/ovenmediaengine/bin/origin_conf
+
+  web:
+#https://hub.docker.com/r/jonasal/nginx-certbot/tags
+    image: jonasal/nginx-certbot:3.2.0
+    container_name: tgrgbox_nginx
+    volumes:
+     - ./html:/usr/share/nginx/html
+     - ./nginx_conf.d/tgrgbox.conf:/etc/nginx/user_conf.d/10_tgrgbox.conf:ro
+     - ./nginx_secrets:/etc/letsencrypt
+{% if host_nginx_config is defined %}
+     - {{host_nginx_config}}:/etc/nginx/user_conf.d/00_host.conf:ro
+{% endif %}
+    ports:
+     - "80:80"
+     - "443:443"
+    restart: unless-stopped
+    environment:
+     - CERTBOT_EMAIL=mgb@alumni.brown.edu
+#     - STAGING=1
+    restart: unless-stopped
+  
+  vouch-proxy:
+#https://quay.io/repository/vouch/vouch-proxy?tab=tags
+    image: quay.io/vouch/vouch-proxy:0.37.3
+    container_name: vouch-proxy
+    environment:
+      - OAUTH_PROVIDER=oidc
+      - VOUCH_DOCUMENT_ROOT=/vouch
+      - OAUTH_CLIENT_ID=${AUTH_PROVIDERS_GENERIC_OAUTH_CLIENT_ID}
+      - OAUTH_CLIENT_SECRET=${AUTH_PROVIDERS_GENERIC_OAUTH_CLIENT_SECRET}
+      - OAUTH_CALLBACK_URL=https://{{tgrgbox_hostname}}/vouch/auth
+      - OAUTH_USER_INFO_URL=http://discord.com/api/users/@me
+      - OAUTH_AUTH_URL=https://discord.com/api/oauth2/authorize
+      - OAUTH_TOKEN_URL=https://discord.com/api/oauth2/token
+      - OAUTH_SCOPES=identify
+#      - VOUCH_LOGLEVEL=debug
+#      - VOUCH_TESTING=true
+      - VOUCH_WHITELIST=${AUTH_WHITELIST}
+#This allows us to accept any email address but still validate against user names
+      - VOUCH_DOMAINS={{tgrgbox_hostname}}
+      - VOUCH_COOKIE_DOMAIN={{tgrgbox_hostname}}
+      #Set the cookies to last for 12 hours
+      - VOUCH_COOKIE_MAXAGE=720
+      - VOUCH_JWT_MAXAGE=720
+    restart: unless-stopped
+
+  ome-keygen:
+    image: node:18.7.0-bullseye
+    container_name: ome-keygen
+    volumes:
+      - "./ome-keygen:/usr/src/app"
+    working_dir: "/usr/src/app"
+    entrypoint: "npm start"
+    restart: unless-stopped
+
+  
+
+networks:
+  default:
+    name: tgrgbox-network
+
