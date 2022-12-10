@@ -1,13 +1,9 @@
-#This is the port that tgrgbox-web will listen on.  This is internal to the
-#docker network so it should be left unchanged
+#This is the port that tgrgbox-web will listen on.  This is internal to the docker network so it should be left unchanged
 port: 8080
 #Set to true to enable development mode.  This can be overridden in production.yml
 development: false
 #The name for your site (used in branding)
 siteName: Tgrgbox
-#This is the API key that OvenMediaEngine can use to communicate with this service.  This is also read from
-#TGRGBOX_API_KEY if you want to keep secrets out of this file.
-apiKey: abcd
 #Discord oauth2 configuration (see https://discord.com/developers/docs/topics/oauth2)
 discord:
   #this is the internet facing callback url.  The api endpoint internally is /login/_oauth.  If you're behind a reverse proxy, than this may change
@@ -16,10 +12,10 @@ discord:
 urls:
   webrtc:
     protocol: "webrtc"
-    url: "wss://tgrgbox.example.com:3333"
+    url: "wss://tgrgbox.example.com/ome-wss"
   hls:
     protocol: "hls"
-    url: "https://tgrgbox.example.com:3333"
+    url: "https://tgrgbox.example.com/ome-hls"
     file: "llhls.m3u8"
 #These are the ingest endpoints
 ingest:
@@ -48,13 +44,11 @@ channels:
     title: Tinky Winky's stream"
     app: "tgrgbace"
     stream: "tinkystream"
-    key: "abcdef"
     users:
     - "TinkyWinky#0001"
-  dispey:
+  dipsy:
     title: "The Dipsy Zone"
     app: "tgrgbace"
-    stream: "dispsy"
-    key: "cat"
+    stream: "dipsy"
     users:
       - "Dipsy#0069"
