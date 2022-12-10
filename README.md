@@ -65,7 +65,7 @@ Copy `env.template` to env and fill in the information
 
 ## Configure tgrgbox-web
 Copy `tgrgbox/config/default.yml.template` to `tgrgbox/config/default.yml` and fill in the information.  This
-includes all users as well as all streams and streamers.
+includes all users as well as all streams and streamers.  The easiest way to get the descriminator is from the web version of discord.
 
 ## Run the docker stack
 cd into the root directory and run
