@@ -1,10 +1,10 @@
 # Prerequisites
 ## Discord setup:
-Go to https://discord.com/developers/applications and log in
+Go to https://discord.com/developers/applications and log in  
 Create an application 
 
 Add redirects that match web endpoint for tgrgbace.  For example, if your tgrgbace
-setup is at https://flinch.tgrgbace.tv, add a redirect for https://flinch.tgrgbace.tv/vouch/auth.  Save the OAuth2 secrets; you'll need these secrets for later.
+setup is at https://tgrgbox.example.com, add a redirect for https://tgrgbox.example.com/login/\_oauth.  Save the OAuth2 secrets; you'll need these secrets for later.
 
 More info at: https://discord.com/developers/docs/topics/oauth2
 
@@ -13,9 +13,8 @@ You'll need to create a DNS record for your hostname (say tgrgbox.com)
 
 ## Master List of secrets and information
 1. OAuth client id and secret id from your discord app
-2. OvenMediaEngine signing key - a random string.  Try to avoid xml metacharacters for your own sanity
-3. A list of discord user names that are allowed to access the platform
-4. A list of discord user names that are allowed to access the streaming key
+2. OvenMediaEngine api key - a random string.  Try to avoid xml metacharacters for your own sanity
+3. A list of discord user names that are allowed to access the platform and stream
 
 
 ## Install prerequesites
@@ -48,57 +47,36 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose
  
 Log out and back in again to pick up the new group
 
-### Install npm
-```
-sudo apt install npm
-```
-
-### Install ansible ###
-```
-sudo apt install ansible
-```
-
 # Installation
 
 ## Clone the git repo:
 ```git clone git@github.com:mboilen/tgrgbox.git```
 
-## Fill in config.yml files
-Copy `ansible/config.template` to `ansible/config.yml` and fill in the information.
+## Fill in .env ##
+Copy `env.template` to env and fill in the information
 
-| Config Key | Value |
-|------------|-------|
-|auth_whitelist | A comma separated list of Discord user names (without discriminator) that are allowed to access the player|
-|keygen_auth_whitelist | A comma separated list of Discord user names (without discriminator) that are allowed to access the streaming keys|
-|discord_client_id | The client id from the Discord OAuth2 app|
-|discord_secret_id | The client secret from the Discord OAuth2 app|
-|tgrgbox_hostname| The base hostname for your tgrgbox instance (the player is at https://tgrgbox_hostname)|
-|tgrgbox_dest_dir | The target directory for your tgrgbox instance.  Ansible will place all its files here |
-|ome_secret_key| A random string that is used as the HMAC key to sign the Oven Media Engine security policies.  Avoid xml metacharacters in this string|
-|letsencrypt_email| The email address that you'll use to get your certificates from LetsEncrypt|
-|tgrgbace_tv_log| A path to a log file that will contain the streamer secrets for the player|
+| Environment Variable | Value |
+|TGRGBOX_HOST| The base hostname for your tgrgbox instance (the player is at https://TGRGBOX_HOST)|
+|TGRGBOX_DISCORD_CLIENT_ID | The client id from the Discord OAuth2 app|
+|TGRGBOX_DISCORD_CLIENT_SECRET | The client secret from the Discord OAuth2 app|
+|TGRGBOX_WEB_API_KEY| A random string used as an api key for OME's Admission Webhooks|
+|LETSENCRYPT_EMAIL| The email address used to obtain certificates from Let's Encrypt|
+|COMPOSE_PROFILES|Leave this alone unless you're using an extrnal reverse proxy|
 
-## Run ansible to generate your install
-
-```
-cd ansible
-ansible-playbook tgrgbox.yml
-```
+## Configure tgrgbox-web
+Copy `tgrgbox/config/default.yml.template` to `tgrgbox/config/default.yml` and fill in the information.  This
+includes all users as well as all streams and streamers.  The easiest way to get the descriminator is from the web version of discord.
 
 ## Run the docker stack
-cd into the tgrgbox_dest_dir and run
+cd into the root directory and run
 ```docker compose up -d``` 
 (or `docker-compose` if you're on an older version of docker compose)
 
-It will take a little while to start up on the first time as tgrgbox_nginx generates a Diffie-Helman key and gets certificates with certbot.  You can monitor progress with
-```docker logs tgrgbox_nginx```
-
-Once that's done you should be able to navigate to https://tgrgbox_hostname
+Once that's done you should be able to navigate to https://TGRGBOX_HOST
 
 ## Test it out
 
-Go to your hostname (i.e. https://flinch.tgrgbace.tv) and it should bring up the player page.  Go to /streamkey (i.e. https://flinch.tgrgbace.tv/streamkey) for the streaming keys.  Plug them into OBS and test it out.
-
+Go to your hostname (i.e. https://tgrgbox.example.com) and it should bring up the player page.  Go to "Your Stream Keys" from the dropdown in the upper right hand corner for the stream details.  Plug them into OBS and test it out.
 
 # Appendix
 

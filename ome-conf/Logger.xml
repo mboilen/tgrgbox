@@ -2,7 +2,7 @@
 
 <Logger version="2">
 	<!-- Log file location -->
-	<Path>/var/log/ovenmediaengine</Path>
+	<!--<Path>/var/log/ovenmediaengine</Path> -->
 
 	<!-- Disable some SRT internal logs -->
 	<Tag name="SRT" level="critical" />
@@ -10,5 +10,5 @@
 	<Tag name=".*\.Stat" level="warn" />
 
 	<!-- Log level: [debug, info, warn, error, critical] -->
-	<Tag name=".*" level="warn" />
+	<Tag name=".*" level="info" />
 </Logger>

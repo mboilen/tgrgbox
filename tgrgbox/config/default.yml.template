@@ -1,0 +1,54 @@
+#This is the port that tgrgbox-web will listen on.  This is internal to the docker network so it should be left unchanged
+port: 8080
+#Set to true to enable development mode.  This can be overridden in production.yml
+development: false
+#The name for your site (used in branding)
+siteName: Tgrgbox
+#Discord oauth2 configuration (see https://discord.com/developers/docs/topics/oauth2)
+discord:
+  #this is the internet facing callback url.  The api endpoint internally is /login/_oauth.  If you're behind a reverse proxy, than this may change
+  callbackUrl: https://tgrgbox.example.com:8080/login/_oauth
+#The publisher urls from OvenMediaEngine.  This is used to build the OvenMediaPlayer configuration (the sources list)
+urls:
+  webrtc:
+    protocol: "webrtc"
+    url: "wss://tgrgbox.example.com/ome-wss"
+  hls:
+    protocol: "hls"
+    url: "https://tgrgbox.example.com/ome-hls"
+    file: "llhls.m3u8"
+#These are the ingest endpoints
+ingest:
+  srt: "srt://tgrgbox.example.com:9999"
+  rtmp: "rtmp://tgrgbox.example.com:1935"
+#A list of Discord usernames (with discriminators) that are allowed access to the site.  All streamers (listed in channels) must be listed here to
+users:
+  - "TinkyWinky#0001"
+  - "Dipsy#0069"
+  - "LaaLaa#0420"
+  - "Po#9001"
+channels:
+  #This is the channel name.  It's used internally as a key
+  main:
+    #The user facing name for the stream (appears in the Web UI)
+    title: "TGRGBACE!"
+    #The application name in the OME configuration
+    app: "tgrgbace"
+    #This is the "stream key" (in OME parlance) that will be used in playback
+    stream: "main"
+    #The users allowed to see the stream key (i.e. use the stream)
+    users:
+      - "TinkyWinky#0001"
+      - "Dipsy#0069"
+  tinkystream:
+    title: Tinky Winky's stream"
+    app: "tgrgbace"
+    stream: "tinkystream"
+    users:
+    - "TinkyWinky#0001"
+  dipsy:
+    title: "The Dipsy Zone"
+    app: "tgrgbace"
+    stream: "dipsy"
+    users:
+      - "Dipsy#0069"
