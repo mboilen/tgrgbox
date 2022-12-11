@@ -44,8 +44,8 @@ services:
       - TGRGBOX_API_KEY=${TGRGBOX_WEB_API_KEY}
       - TGRGBOX_DISCORD_CLIENT_ID=${TGRGBOX_DISCORD_CLIENT_ID}
       - TGRGBOX_DISCORD_CLIENT_SECRET=${TGRGBOX_DISCORD_CLIENT_SECRET}
-      - DEBUG=tgrgbox:*
-      - DEBUG_DEPTH=4
+        #- DEBUG=tgrgbox:*
+        #- DEBUG_DEPTH=4
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./tgrgbox/config/default.yml:/app/config/default.yml:ro
