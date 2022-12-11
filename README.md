@@ -69,10 +69,12 @@ includes all users as well as all streams and streamers.  The easiest way to get
 
 ## Run the docker stack
 cd into the root directory and run
-```docker compose up -d``` 
+```docker create network tgrgbox-network
+docker compose up -d``` 
 (or `docker-compose` if you're on an older version of docker compose)
 
-Once that's done you should be able to navigate to https://TGRGBOX_HOST
+Once that's done you should be able to navigate to https://TGRGBOX_HOST.  
+It seems that traefik creates acme.json with the wrong permissions.  Check docker logs traefik on first execution.  You may have to `chmod 600 traefik/acme.json` and then `docker restart traefik`.
 
 ## Test it out
 
