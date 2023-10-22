@@ -62,7 +62,7 @@ services:
       - tgrgbox-network
 
   traefik:
-    image: traefik:v2.10.4
+    image: traefik:2.10.5
     container_name: traefik
     restart: unless-stopped
     profiles: ["reverse-proxy"]
