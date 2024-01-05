@@ -56,12 +56,13 @@ Log out and back in again to pick up the new group
 Copy `env.template` to env and fill in the information
 
 | Environment Variable | Value |
-|TGRGBOX_HOST| The base hostname for your tgrgbox instance (the player is at https://TGRGBOX_HOST)|
-|TGRGBOX_DISCORD_CLIENT_ID | The client id from the Discord OAuth2 app|
-|TGRGBOX_DISCORD_CLIENT_SECRET | The client secret from the Discord OAuth2 app|
-|TGRGBOX_WEB_API_KEY| A random string used as an api key for OME's Admission Webhooks|
-|LETSENCRYPT_EMAIL| The email address used to obtain certificates from Let's Encrypt|
-|COMPOSE_PROFILES|Leave this alone unless you're using an extrnal reverse proxy|
+|---|---|
+| TGRGBOX_HOST | The base hostname for your tgrgbox instance (the player is at https://TGRGBOX_HOST)|
+| TGRGBOX_DISCORD_CLIENT_ID | The client id from the Discord OAuth2 app|
+| TGRGBOX_DISCORD_CLIENT_SECRET | The client secret from the Discord OAuth2 app|
+| TGRGBOX_WEB_API_KEY | A random string used as an api key for OME's Admission Webhooks|
+| LETSENCRYPT_EMAIL | The email address used to obtain certificates from Let's Encrypt|
+| COMPOSE_PROFILES |Leave this alone unless you're using an external reverse proxy|
 
 ## Configure tgrgbox-web
 Copy `tgrgbox/config/default.yml.template` to `tgrgbox/config/default.yml` and fill in the information.  This
