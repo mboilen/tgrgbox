@@ -4,7 +4,7 @@ services:
 #https://hub.docker.com/r/airensoft/ovenmediaengine/tags
   ovenmediaengine:
     container_name: ovenmediaengine
-    image: airensoft/ovenmediaengine:0.16.5
+    image: airensoft/ovenmediaengine:0.16.8
     ports:
       - "1935:1935/tcp"
       - "3333:3333/tcp"
