@@ -1,41 +1,69 @@
-#This is the port that tgrgbox-web will listen on.  This is internal to the docker network so it should be left unchanged
 port: 8080
 #Set to true to enable development mode.  This can be overridden in production.yml
 development: false
 #The name for your site (used in branding)
 siteName: Tgrgbox
+#This is the API key that OvenMediaEngine can use to communicate with this service.  This is also read from
+#TGRGBOX_API_KEY if you want to keep secrets out of this file.
+apiKey: abcd
 #Discord oauth2 configuration (see https://discord.com/developers/docs/topics/oauth2)
 discord:
+  #These are also read from TGRGBOX_DISCORD_CLIENT_ID and TGRGBOX_DISCORD_CLIENT_SECRET so this file can be 
+  #free of secrets
+  clientId: "clientid"
+  clientSecret: "clientsecret"
   #this is the internet facing callback url.  The api endpoint internally is /login/_oauth.  If you're behind a reverse proxy, than this may change
-  callbackUrl: https://tgrgbox.example.com:8080/login/_oauth
+  callbackUrl: http://tgrgbox.example.com:8080/login/_oauth
 #The publisher urls from OvenMediaEngine.  This is used to build the OvenMediaPlayer configuration (the sources list)
 urls:
   webrtc:
     protocol: "webrtc"
-    url: "wss://tgrgbox.example.com/ome-wss"
+    url: "wss://tgrgbox.example.com:3333"
   hls:
     protocol: "hls"
-    url: "https://tgrgbox.example.com/ome-hls"
+    url: "https://tgrgbox.example.com:3333"
     file: "llhls.m3u8"
 #These are the ingest endpoints
 ingest:
   srt: "srt://tgrgbox.example.com:9999"
   rtmp: "rtmp://tgrgbox.example.com:1935"
+  whip: "https://tgrgbox.example.com:3333"
 #A list of Discord usernames (with discriminators) that are allowed access to the site.  All streamers (listed in channels) must be listed here to
 users:
   - "TinkyWinky#0001"
   - "Dipsy#0069"
   - "LaaLaa#0420"
   - "Po#9001"
-channels:
-  #This is the channel name.  It's used internally as a key
+broadcasts:
+  #This is a stream that can be switched between a collection of channels.  Each name is used internally as a key.
+  #Channel and broadcast names must all be distinct.
+  primary:
+    #The title of the broadcast
+    title: "TGRGBACE!"
+    #These are the users who are allowed to control the stream switcher
+    users:
+      - "TinkyWinky#0001"
+      - "Dipsy#0069"
+      - "LaaLaa#420"
+    #These are the streams that appear in the switcher.  They can appear in multiple broadcasts
+    streams:
+      - main
+      - tinkystream
+  froyo:
+    users:
+      - "TinkyWinky#0001"
+      - "Po#9001"
+    #These are the streams that appear in the switcher.  They can appear in multiple broadcasts
+    streams:
+      - tinkystream
+      - dipsey
+streams:
+  #This is the stream name.  It's used internally as a key
   main:
     #The user facing name for the stream (appears in the Web UI)
     title: "TGRGBACE!"
-    #The application name in the OME configuration
+    #The application name in the OME configuration.
     app: "tgrgbace"
-    #This is the "stream key" (in OME parlance) that will be used in playback
-    stream: "main"
     #The users allowed to see the stream key (i.e. use the stream)
     users:
       - "TinkyWinky#0001"
@@ -46,9 +74,9 @@ channels:
     stream: "tinkystream"
     users:
     - "TinkyWinky#0001"
-  dipsy:
+  dipsey:
     title: "The Dipsy Zone"
     app: "tgrgbace"
-    stream: "dipsy"
+    stream: "dipssy"
     users:
       - "Dipsy#0069"
